@@ -21,9 +21,12 @@ $ npm install file-type-stream2
 ```
 
 # Examples:
-Explanation of 'how it works' step by step:
+Explanation of 'how it works' step by step (examples in next section):
 ```js
-readableStream.pipe( fileTypeStream( (mime) => {writableStream.mime = mime} )).pipe(writableStream);
+readableStream
+  .pipe( fileTypeStream( (mime) => {
+    writableStream.mime = mime} ))
+  .pipe(writableStream);
 ```
 1. Pipe readable stream to FileTypeStream2 instance.
 2. FileTypeStream2 will collect bytes until it will be able to recognize file type by it's content.
@@ -82,7 +85,9 @@ readStream
 If you want only detect file type basing on it's content then this example is for you.
 You just have to use [file-type](https://www.npmjs.com/package/file-type) module:
 ```js
-import fileType from "file-type"; // alternatively `let fileType = require("file-type");`
+import fileType from "file-type";
+// let fileType = require("file-type");
+
 let first_4100_bytes_buffer = getFirstBytesSomehow(); // you can be less efficient and read whole file into buffer
 let ft = fileType(first_4100_bytes_buffer);
 ft = ft && ft.mime; // mime type string or null
@@ -91,7 +96,7 @@ ft = ft && ft.mime; // mime type string or null
 # Documentation:
 
 ## function `fileTypeStream( callback?: (mimeType: string) => void ): FileTypeStream2`
-### this function returns FileTypeStream2 instance (details below)
+### this function is exported directly from module.<br>It returns FileTypeStream2 instance (details below).
 
 ## class `FileTypeStream2`
 - ### `constructor( callback?: (mimeType: string) => void )`<br>- when mime type of file detected then `callback` will be called with proper `mimeType` string.
