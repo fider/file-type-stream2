@@ -1,12 +1,14 @@
 import { FileTypeStream2 } from "./FileTypeStream2";
+import { DuplexOptions } from "stream";
+import { FileTypeResult } from "file-type";
 
 
 
 // Exposed module interface
-export function fileTypeStream(callback?: (mimeType: string) => void): FileTypeStream2 {
+export function fileTypeStream(callback?: (fileTypeResult: FileTypeResult) => void, opts?: DuplexOptions): FileTypeStream2 {
     if (callback && typeof callback !== "function") {
         throw new Error(`fileTypeStream(callback?). Provided optional callback is not a function. Actual="${callback}"`);
     }
 
-    return new FileTypeStream2(callback);
+    return new FileTypeStream2(callback, opts);
 }

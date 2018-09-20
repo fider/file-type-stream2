@@ -24,9 +24,9 @@ describe("index.ts", function() {
 
         it(":", function() {
 
-            let missing = EXPECTED_PROTO.filter( (property:string) => ( ! ACTUAL_PROTO.includes(property)) );
+            let missing = EXPECTED_PROTO.filter( (property: string) => ( ! ACTUAL_PROTO.includes(property)) );
 
-            missing = missing.filter( property => ( ! property.startsWith("__") ));
+            missing = missing.filter( (property) => ( ! property.startsWith("__") ));
             if ( ! deepEqual(missing, [])) {
                 fail(`Detected missing properties in module interface:\n - ${missing.join("\n -")}`);
             }
@@ -35,9 +35,9 @@ describe("index.ts", function() {
 
         it(":", function() {
 
-            let unknown = ACTUAL_PROTO.filter( (property:string) => ( ! EXPECTED_PROTO.includes(property)) );
+            let unknown = ACTUAL_PROTO.filter( (property: string) => ( ! EXPECTED_PROTO.includes(property)) );
 
-            unknown = unknown.filter( property => ( ! property.startsWith("__") ));
+            unknown = unknown.filter( (property) => ( ! property.startsWith("__") ));
             if ( ! deepEqual(unknown, [])) {
                 fail(`Detected new unknown (not tested?) properties in module interface:\n - ${unknown.join("\n -")}`);
             }

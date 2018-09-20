@@ -1,10 +1,10 @@
 {
-  "name": "TODO",
+  "name": "file-type-stream2",
   "version": "1.0.0",
   "description": "TODO",
   "main": "./lib/src/index.js",
   "scripts": {
-    "build": "tsc  &&  npm run lint",
+    "build": "npm run clean  &&  tsc  &&  npm run lint",
     "build:publish": "npm run clean && npm run lint && tsc --sourceMap false && rm -rf lib/test",
     "clean": "rm -rf .nyc_output coverage lib",
     "lint": "tslint -p ./tsconfig.json",
