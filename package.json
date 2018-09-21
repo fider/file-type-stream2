@@ -1,7 +1,8 @@
 {
+  "author": "Wojciech Fiderek",
   "name": "file-type-stream2",
   "version": "1.0.0",
-  "description": "TODO",
+  "description": "Improved detection of file type basing on it's binary content.",
   "main": "./lib/src/index.js",
   "scripts": {
     "build": "npm run clean  &&  tsc  &&  npm run lint",
@@ -15,22 +16,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TODO_USERNAME/TODO_PROJECT_NAME.git"
+    "url": "git+https://github.com/fider/file-type-stream2.git"
   },
   "keywords": [
-    "TODO",
-    "TODO"
+    "file",
+    "type",
+    "stream"
   ],
-  "author": "TODO",
   "license": "MIT",
   "devDependencies": {
-    "@types/deep-equal": "^1.0.1",
+    "@types/deep-equal": "1.0.1",
     "@types/file-type": "^5.2.1",
-    "@types/jasmine": "2.5.35",
+    "@types/jasmine": "^2.8.8",
     "@types/node": "^10.10.1",
-    "deep-equal": "^1.0.1",
+    "deep-equal": "1.0.1",
     "istanbul": "1.1.0-alpha.1",
-    "jasmine": "2.5.2",
+    "jasmine": "3.2.0",
     "jasmine-ts": "0.2.1",
     "nyc": "13.0.1",
     "ts-node": "1.6.0",
@@ -38,10 +39,10 @@
     "typescript": "2.9.2"
   },
   "bugs": {
-    "url": "https://github.com/TODO_USERNAME/TODO_PROJECT_NAME/issues"
+    "url": "https://github.com/fider/file-type-stream2/issues"
   },
-  "homepage": "https://github.com/TODO_USERNAME/TODO_PROJECT_NAME#readme",
+  "homepage": "https://github.com/fider/file-type-stream2#readme",
   "dependencies": {
-    "file-type": "^9.0.0"
+    "file-type": "9.0.0"
   }
 }

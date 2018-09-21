@@ -11,7 +11,7 @@
         "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
         "member-access": [true, "no-public"],
         "one-line": [true, "check-catch", "check-finally", "check-open-brace", "check-whitespace"],
-        "max-line-length": [true, 140]
+        "max-line-length": [true, 200]
     },
     "rulesDirectory": []
 }

@@ -34,7 +34,7 @@ export class FileTypeStream2 extends Duplex {
         }
         this._fileTypeCallback = callback;
 
-        this._state = "X" as any;
+        this._state = MIME_DETECTION_STATE;
     }
 
 
