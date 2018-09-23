@@ -1,5 +1,5 @@
 import { fileTypeStream, FileTypeResult, FileTypeStream2 } from "../../src";
-import { Readable, Transform, Writable, TransformCallback } from "stream";
+import { Readable, Transform, Writable, TransformCallback, Stream } from "stream";
 import { createReadStream, readFileSync } from "fs";
 import * as path from "path";
 
@@ -7,9 +7,9 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
 
     let input: Readable;
     let fts: FileTypeStream2;
-    let fileTypeResult: FileTypeResult | undefined = undefined;
+    let fileTypeResult: FileTypeResult | undefined;
     let processor: Transform & {fileType?: FileTypeResult};
-    let output: Writable;
+    let streamAfter: Writable;
     let result: Buffer;
 
 
@@ -19,6 +19,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         let fileTypeEventSpy: jasmine.Spy | undefined;
 
         beforeEach(function() {
+            // do nothing
         });
 
 
@@ -30,17 +31,17 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         ];
 
         inputData.forEach( (DATA) => {
-            let data = DATA; // Need closure variable;
+            const data = DATA; // Need closure variable;
 
             function testCaseThatRequireFileTypeStream(done: DoneFn) {
                 //
                 // Input
                 //
-                let filePath = path.join(__dirname, "../exampleFiles", data.file);
+                const filePath = path.join(__dirname, "../exampleFiles", data.file);
                 input = createReadStream( filePath );
 
                 processor = new Transform({
-                    transform: function(chunk: any, _encoding: string, callback: TransformCallback) {
+                    transform(chunk: any, _encoding: string, callback: TransformCallback) {
                         if ( ! (fileTypeResult && fileTypeResult.mime)) {
                             fail(`Expected that fileType will be determined before first chunk of data will get to "processor" stream.`);
                         }
@@ -49,9 +50,9 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
                 });
 
                 result = Buffer.from([]);
-                output = new Writable({
+                streamAfter = new Writable({
                     write(chunk: any, _encoding: string, callback: (error?: Error | null) => void) {
-                        let length = result.length + chunk.length;
+                        const length = result.length + chunk.length;
                         result = Buffer.concat([result, chunk], length);
                         callback();
                     }
@@ -64,14 +65,14 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
                 input
                     .pipe(fts)
                     .pipe(processor)
-                    .pipe(output);
+                    .pipe(streamAfter);
 
 
                 //
                 // Verify
                 //
-                output.on("finish", function verifyResult() {
-                    let expectedResult = readFileSync(filePath);
+                streamAfter.on("finish", function verifyResult() {
+                    const expectedResult = readFileSync(filePath);
                     if (result.toString() !== expectedResult.toString()) {
                         fail(`Processed stream malformed.\nResult="${result.toString().substr(0, 10)}..."\nExpectedResult="${expectedResult.toString().substr(0, 10)}..."`);
                     }
@@ -149,7 +150,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
 
                 testCaseThatRequireFileTypeStream(done);
             });
-        })
+        });
 
     });
 
@@ -160,10 +161,10 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         //
         // Input
         //
-        let filePath = path.join(__dirname, "../exampleFiles/testFile.png");
+        const filePath = path.join(__dirname, "../exampleFiles/testFile.png");
         input = createReadStream( filePath );
 
-        output = new Writable({
+        streamAfter = new Writable({
             write(_chunk: any, _encoding: string, callback: (error?: Error | null) => void) {
                 // Reuslt not verified in this test case
                 callback();
@@ -171,11 +172,11 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         });
 
 
-        let fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
+        const fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
             fileTypeResult = fileType;
         }).and.callThrough();
 
-        let fileTypeEventSpy = jasmine.createSpy("fileTypeEventSpy", (fileType: FileTypeResult): void => {
+        const fileTypeEventSpy = jasmine.createSpy("fileTypeEventSpy", (fileType: FileTypeResult): void => {
             fileTypeResult = fileType;
         }).and.callThrough();
 
@@ -186,13 +187,13 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         fts = fileTypeStream( fileTypeCallbackSpy );
         fts.onFileType( fileTypeEventSpy );
 
-        input.pipe(fts).pipe(output);
+        input.pipe(fts).pipe(streamAfter);
 
 
         //
         // Verify
         //
-        output.on("finish", function verifyTestCase() {
+        streamAfter.on("finish", function verifyTestCase() {
             expect(fileTypeCallbackSpy).toHaveBeenCalledTimes(1);
             expect(fileTypeCallbackSpy).toHaveBeenCalledWith({ext: "png", mime: "image/png"});
 
@@ -206,29 +207,38 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
     });
 
 
-    it(`Should process chunks in expected (async) order adapted to highWaterMark of input`, async function(done: DoneFn) {
-        let outputChunks: Buffer[] = [];
+    const inputFilePath = path.join(__dirname, "../exampleFiles/testFile.rtf");
+    it(`Should process chunks in expected (async) order adapted to highWaterMark of input.\n`
+     + `This test case strongly depends on used test file and currently it is adapted to file: ${inputFilePath}`, async function(done: DoneFn) {
+        const dataFlow: Array<{source: Stream, data: Buffer}> = [];
 
 
         //
         // Input
         //
-        let filePath = path.join(__dirname, "../exampleFiles/testFile.rtf");
-        input = createReadStream( filePath, {
+        input = createReadStream( inputFilePath, {
             highWaterMark: 2
         });
 
-        output = new Writable({
+        const streamBefore = new Transform({
+            transform(chunk: any, encoding: string, callback: TransformCallback) {
+                dataFlow.push({source: this, data: Buffer.from(chunk)});
+                callback(undefined, chunk);
+            },
+        });
+
+        streamAfter = new Writable({
             write(chunk: any, _encoding: string, callback: (error?: Error | null) => void) {
-                outputChunks.push(chunk);
+                dataFlow.push({source: this, data: Buffer.from(chunk)});
                 callback();
             }
         });
 
 
-        let fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
+        const fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
             fileTypeResult = fileType;
         }).and.callThrough();
+
 
 
         //
@@ -236,28 +246,54 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         //
         fts = fileTypeStream( fileTypeCallbackSpy );
 
-        input.pipe(fts).pipe(output);
+        input
+            .pipe(streamBefore)
+            .pipe(fts)
+            .pipe(streamAfter);
 
 
         //
         // Verify
         //
-        output.on("finish", function verifyTestCase() {
+        streamAfter.on("finish", function verifyTestCase() {
 
-            for (let [index, chunk] of outputChunks.entries()) {
-                if (index === 0) { // First chunk
-                    if (chunk.length !== 6) {
-                        fail(`Invalid chunk length=${chunk.length}. Expected length=6. Chunk index=${index}.`);
+            for (const [index, {source, data}] of dataFlow.entries()) {
+                // Step 1)  First 3 input chunks
+                if (index >= 0 && index <= 2) {
+                    if ( ! (source === streamBefore && data.length === 2)) {
+                        fail(`Invalid chunk isSourceOk=${source === streamBefore}. Length Expected=2, Actual=${data.length}. Chunk index=${index}.`);
                     }
                 }
-                else if (index === 93) { // Last chunk
-                    if (chunk.length !== 1) {
-                        fail(`Invalid chunk length=${chunk.length}. Expected length=2. Chunk index=${index}.`);
+                // Step 2)  Chunk no. 4 (summary length of first 3 chunks)
+                else if (index === 3) {
+                    if ( ! (source === streamAfter && data.length === 6)) {
+                        fail(`Invalid chunk isSourceOk=${source === streamAfter}. Length Expected=2, Actual=${data.length}. Chunk index=${index}.`);
                     }
                 }
+                // Even
+                else if (index % 2 === 0) {
+                    let expectedLength = 2;
+
+                    // IF last input chunk
+                    if (index === 188) {
+                        expectedLength = 1;
+                    }
+
+                    if ( ! (source === streamBefore && data.length === expectedLength)) {
+                        fail(`Invalid chunk isSourceOk=${source === streamBefore}. Length Expected=${expectedLength}, Actual=${data.length}. Chunk index=${index}.`);
+                    }
+                }
+                // Odd
                 else {
-                    if (chunk.length !== 2) {
-                        fail(`Invalid chunk length=${chunk.length}. Expected length=2. Chunk index=${index}.`);
+                    let expectedLength = 2;
+
+                    // IF last output chunk
+                    if ( index === 189 ) {
+                        expectedLength = 1;
+                    }
+
+                    if ( ! (source === streamAfter && data.length === expectedLength)) {
+                        fail(`Last chunk invalid. isSourceOk=${source === streamAfter}. Length Expected=${expectedLength}, Actual=${data.length}. Chunk index=${index}.`);
                     }
                 }
             }
