@@ -1,13 +1,13 @@
 # Ingore antyhing:
-
-# root files
-*
-
-# root dirs
-*/
+/*
 
 # Except
-!lib/src/*
+!/lib/
+
+/lib/*
+
+!/lib/src
+
 !LICENSE
 !package-lock.json
 !package.json
