@@ -1,5 +1,11 @@
 # Ingore antyhing:
+
+# root files
 *
+
+# root dirs
+*/
+
 # Except
 !lib/src/*
 !LICENSE

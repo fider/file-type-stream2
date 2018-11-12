@@ -1,7 +1,7 @@
 {
   "author": "Wojciech Fiderek",
   "name": "file-type-stream2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Improved detection of file type basing on it's binary content.",
   "main": "./lib/src/index.js",
   "scripts": {
