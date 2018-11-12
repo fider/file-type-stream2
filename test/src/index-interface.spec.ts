@@ -15,7 +15,7 @@ describe("index.ts", function() {
         beforeEach( function() {
             EXPECTED_PROTO = [
                 "fileTypeStream",
-                "FileTypeStream2"
+                "FileTypeStream2",
                 // DuplexOptions  - only TypeScript interfaca
                 // FileTypeResult - only TypeScript interfaca
             ];

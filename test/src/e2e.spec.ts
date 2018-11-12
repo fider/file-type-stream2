@@ -7,7 +7,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
 
     let input: Readable;
     let fts: FileTypeStream2;
-    let fileTypeResult: FileTypeResult | undefined = undefined;
+    let fileTypeResult: FileTypeResult | undefined;
     let processor: Transform & {fileType?: FileTypeResult};
     let output: Writable;
     let result: Buffer;
@@ -19,6 +19,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         let fileTypeEventSpy: jasmine.Spy | undefined;
 
         beforeEach(function() {
+            // nothing to do
         });
 
 
@@ -30,31 +31,31 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         ];
 
         inputData.forEach( (DATA) => {
-            let data = DATA; // Need closure variable;
+            const data = DATA; // Need closure variable;
 
             function testCaseThatRequireFileTypeStream(done: DoneFn) {
                 //
                 // Input
                 //
-                let filePath = path.join(__dirname, "../exampleFiles", data.file);
+                const filePath = path.join(__dirname, "../exampleFiles", data.file);
                 input = createReadStream( filePath );
 
                 processor = new Transform({
-                    transform: function(chunk: any, _encoding: string, callback: TransformCallback) {
+                    transform(chunk: any, _encoding: string, callback: TransformCallback) {
                         if ( ! (fileTypeResult && fileTypeResult.mime)) {
                             fail(`Expected that fileType will be determined before first chunk of data will get to "processor" stream.`);
                         }
                         callback(undefined, chunk);
-                    }
+                    },
                 });
 
                 result = Buffer.from([]);
                 output = new Writable({
                     write(chunk: any, _encoding: string, callback: (error?: Error | null) => void) {
-                        let length = result.length + chunk.length;
+                        const length = result.length + chunk.length;
                         result = Buffer.concat([result, chunk], length);
                         callback();
-                    }
+                    },
                 });
 
 
@@ -71,7 +72,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
                 // Verify
                 //
                 output.on("finish", function verifyResult() {
-                    let expectedResult = readFileSync(filePath);
+                    const expectedResult = readFileSync(filePath);
                     if (result.toString() !== expectedResult.toString()) {
                         fail(`Processed stream malformed.\nResult="${result.toString().substr(0, 10)}..."\nExpectedResult="${expectedResult.toString().substr(0, 10)}..."`);
                     }
@@ -149,7 +150,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
 
                 testCaseThatRequireFileTypeStream(done);
             });
-        })
+        });
 
     });
 
@@ -160,22 +161,22 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         //
         // Input
         //
-        let filePath = path.join(__dirname, "../exampleFiles/testFile.png");
+        const filePath = path.join(__dirname, "../exampleFiles/testFile.png");
         input = createReadStream( filePath );
 
         output = new Writable({
             write(_chunk: any, _encoding: string, callback: (error?: Error | null) => void) {
                 // Reuslt not verified in this test case
                 callback();
-            }
+            },
         });
 
 
-        let fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
+        const fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
             fileTypeResult = fileType;
         }).and.callThrough();
 
-        let fileTypeEventSpy = jasmine.createSpy("fileTypeEventSpy", (fileType: FileTypeResult): void => {
+        const fileTypeEventSpy = jasmine.createSpy("fileTypeEventSpy", (fileType: FileTypeResult): void => {
             fileTypeResult = fileType;
         }).and.callThrough();
 
@@ -207,26 +208,26 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
 
 
     it(`Should process chunks in expected (async) order adapted to highWaterMark of input`, async function(done: DoneFn) {
-        let outputChunks: Buffer[] = [];
+        const outputChunks: Buffer[] = [];
 
 
         //
         // Input
         //
-        let filePath = path.join(__dirname, "../exampleFiles/testFile.rtf");
+        const filePath = path.join(__dirname, "../exampleFiles/testFile.rtf");
         input = createReadStream( filePath, {
-            highWaterMark: 2
+            highWaterMark: 2,
         });
 
         output = new Writable({
             write(chunk: any, _encoding: string, callback: (error?: Error | null) => void) {
                 outputChunks.push(chunk);
                 callback();
-            }
+            },
         });
 
 
-        let fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
+        const fileTypeCallbackSpy = jasmine.createSpy("fileTypeCallbackSpy", (fileType: FileTypeResult): void => {
             fileTypeResult = fileType;
         }).and.callThrough();
 
@@ -244,7 +245,7 @@ describe("E2E (End To End) test of FileTypeStream2 module.", function() {
         //
         output.on("finish", function verifyTestCase() {
 
-            for (let [index, chunk] of outputChunks.entries()) {
+            for (const [index, chunk] of outputChunks.entries()) {
                 if (index === 0) { // First chunk
                     if (chunk.length !== 6) {
                         fail(`Invalid chunk length=${chunk.length}. Expected length=6. Chunk index=${index}.`);

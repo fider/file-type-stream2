@@ -99,6 +99,12 @@ ft = ft && ft.mime; // mime type string or null
 
 # Documentation:
 
+## Module exported members
+  - `fileTypeStream` function that returns Duplex stream file type detector.
+  - `FileTypeStream2` class (for typing purposes only).
+  - `DuplexOptions` interface.
+  - `FileTypeResult` interface.
+
 ## function `fileTypeStream( callback?: (fileTypeResult: FileTypeResult) => void, opts?: DuplexOptions ): FileTypeStream2`
 This function is exported directly from module.<br>It returns FileTypeStream2 instance that is native Duplex stream (details below).
   - Arg[0] `[callback] (fileTypeResult: {mime: string, ext: string}) => void`:<br>
@@ -107,15 +113,17 @@ This function is exported directly from module.<br>It returns FileTypeStream2 in
     Options for returned FileTypeStream2 object (instance of `Duplex` stream).<br>Do **NOT** set to `objectMode` because file type detection will not be possible (expect unhandled error).<br>Use only if you are aware of what you are doing (eg. set custom `hihgWaterMark`).
 
 ## class `FileTypeStream2` extends `Duplex` stream
-Internal class returned by `fileTypeStream` function.
+Internal class returned by `fileTypeStream` function. Documented only for development purposes.
 - #### `constructor( callback?: (fileTypeResult: FileTypeResult) => void, opts?: DupexOptions )`
   It is called internally by `fileTypeStream` function for you.
   - Arg[0] `[callback] (fileTypeResult: FileTypeResult) => void`:<br>
     When mime type of file detected then `callback` will be called with proper `fileTypeResult` object (`{mime: string, ext: string}`) (`onFileType` method also can be used to provide additonal `callback`).<br>
   - Arg[1] `[opts] DuplexOptions`:<br>
     Options for `Duplex` stream. Do **NOT** set to `objectMode` because file type detection will not be possible (expect unhandled error).Use only if you are aware of what you are doing (eg. set custom `hihgWaterMark`).
-- #### `onFileType( callback: (fileTypeResult: FileTypeResult) => void )`<br>
+- #### `onFileType( callback: (fileTypeResult: FileTypeResult) => void )`
   When mime type of file detected then `callback` will be called with proper `fileTypeResult` string. This method is equivalent of `on("fileType", callback)`.
+  - Arg[0] `[callback] (fileTypeResult: FileTypeResult) => void`:<br>
+    When mime type of file detected then `callback` will be called with proper `fileTypeResult` object (`{mime: string, ext: string}`) (The same callback can be provided also via `constructor`).<br>
 
 ## interface `FileTypeResult`
 Interface returned from [file-type](https://www.npmjs.com/package/file-type) module.<br>Argument provided for your callbacks.

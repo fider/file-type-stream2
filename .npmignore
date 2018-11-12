@@ -1,7 +1,7 @@
 # Ingore antyhing:
 *
 # Except
-!lib/src
+!lib/src/*
 !LICENSE
 !package-lock.json
 !package.json
