@@ -4,6 +4,7 @@
   "version": "1.0.1",
   "description": "Improved detection of file type basing on it's binary content.",
   "main": "./lib/src/index.js",
+  "types": "./lib/src/index.d.ts",
   "scripts": {
     "build": "npm run clean  &&  tsc  &&  npm run lint",
     "build:publish": "npm run clean && npm run lint && tsc --sourceMap false && rm -rf lib/test",
@@ -26,9 +27,9 @@
   "license": "MIT",
   "devDependencies": {
     "@types/deep-equal": "1.0.1",
-    "@types/file-type": "^5.2.1",
-    "@types/jasmine": "^2.8.8",
-    "@types/node": "^10.10.1",
+    "@types/file-type": "5.2.1",
+    "@types/jasmine": "2.8.8",
+    "@types/node": "10.10.1",
     "deep-equal": "1.0.1",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.2.0",

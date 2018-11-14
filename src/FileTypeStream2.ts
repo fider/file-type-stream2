@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
 import { Duplex, DuplexOptions } from "stream";
+import fileType = require("file-type");
 import { FileTypeResult } from "file-type";
-import fileType from "file-type";
 
 
 
