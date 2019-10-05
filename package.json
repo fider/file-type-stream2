@@ -44,6 +44,6 @@
   },
   "homepage": "https://github.com/fider/file-type-stream2#readme",
   "dependencies": {
-    "file-type": "9.0.0"
+    "file-type": "12.3.0"
   }
 }
